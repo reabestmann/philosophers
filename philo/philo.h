@@ -6,7 +6,7 @@
 /*   By: rbestman <rbestman@student.42berlin.de>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/06/28 19:54:22 by rbestman          #+#    #+#             */
-/*   Updated: 2025/06/30 16:22:33 by rbestman         ###   ########.fr       */
+/*   Updated: 2025/07/05 18:54:39 by rbestman         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -39,10 +39,21 @@ typedef enum	e_opcode
 
 typedef	enum	e_time
 {
-	SECOND;
-	MILLISECOND;
-	MICROSECOND;
+	SECOND,
+	MILLISECOND,
+	MICROSECOND
 }	t_time;
+
+typedef enum	e_status
+{
+	EAT,
+	SLEEP,
+	THINK,
+	RIGHT_FORK,
+	LEFT_FORK,
+	DIE,
+	FULL
+}	t_status;
 
 typedef	struct s_fork
 {
@@ -59,7 +70,8 @@ typedef struct s_philo
 	t_fork	*left_fork;
 	t_fork	*right_fork;
 	pthread_t	thread_id; // a philo is a thread
-	t_table	*table // pointer to table data
+	t_table	*table; // pointer to table data
+	t_mutex	mutex;
 }	t_philo;
 
 typedef struct	s_table
@@ -72,7 +84,10 @@ typedef struct	s_table
 	long	start_simulation;
 	bool	end_simulation; // when a philo dies or all are full
 	bool	all_threads_ready;
+	long	threads_running;
+	pthread_t	monitor;
 	t_mutex	mutex;
+	t_mutex	write_mutex;
 	t_fork	*forks; // pointer to all forks
 	t_philo	*philos; // pointer to all philos
 }	t_table;
@@ -80,12 +95,12 @@ typedef struct	s_table
 /* wrapper.c */
 
 void	*handle_malloc(size_t bytes);
-void	*handle_mutex(t_mutex *mutex, t_opcode opcode);
-void	*handle_threads(pthread_t *thread, void *(*foo)(void *), void *data, t_opcode opcode);
+void	handle_mutex(t_mutex *mutex, t_opcode opcode);
+void	handle_threads(pthread_t *thread, void *(*foo)(void *), void *data, t_opcode opcode);
 
 /* error.c */
 
-void	error(char *msg);
+void	error(const char *msg);
 void	thread_error(int status, t_opcode opcode);
 void	mutex_error(int status, t_opcode opcode);
 
@@ -100,6 +115,12 @@ void	data_init(t_table *table);
 /* dinner.c */
 
 void	start_dinner(t_table *table);
+void	think(t_philo *philo, bool pre_sim);
+/* utils.c */
+
+void	clean(t_table *table);
+long    gettime(t_time time);
+void    precise_usleep(long usec, t_table *table);
 
 /* set_get.c */
 
@@ -112,6 +133,17 @@ bool	end_simulation(t_table *table);
 /* sync.c */
 
 void	wait_threads(t_table *table);
+bool    all_threads_running(t_mutex *mutex, long *threads, long philo_nbr);
+void    increase_long(t_mutex *mutex, long *value);
+void    desync_philos(t_philo *philo);
 
+/* write.c */
+
+void    write_status(t_status status, t_philo *philo);
+
+/* monitor.c */
+
+void    *monitor_dinner(void *data);
+bool	sim_fin(t_table *table);
 
 #endif

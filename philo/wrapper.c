@@ -1,12 +1,12 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   utils.c                                            :+:      :+:    :+:   */
+/*   wrapper.c                                          :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: rbestman <rbestman@student.42berlin.de>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/06/28 20:30:09 by rbestman          #+#    #+#             */
-/*   Updated: 2025/06/30 16:14:05 by rbestman         ###   ########.fr       */
+/*   Updated: 2025/07/05 18:15:53 by rbestman         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -22,10 +22,10 @@ void	*handle_malloc(size_t bytes)
 	return (ret);
 }
 
-void	*handle_mutex(t_mutex *mutex, t_opcode opcode)
+void	handle_mutex(t_mutex *mutex, t_opcode opcode)
 {
 	if (opcode == LOCK)
-		mutex_error(pthead_mutex_lock(mutex), opcode);
+		mutex_error(pthread_mutex_lock(mutex), opcode);
 	else if (opcode == UNLOCK)
 		mutex_error(pthread_mutex_unlock(mutex), opcode);
 	else if (opcode == DESTROY)
@@ -36,13 +36,13 @@ void	*handle_mutex(t_mutex *mutex, t_opcode opcode)
 		error("Mutex: Operation invalid - use <LOCK> <UNLOCK> <DESTROY> <INIT>");
 }
 
-void	*handle_threads(pthread_t *thread, void *(*foo)(void *), void *data, t_opcode opcode)
+void	handle_threads(pthread_t *thread, void *(*foo)(void *), void *data, t_opcode opcode)
 {
 	if (opcode == CREATE)
 		thread_error(pthread_create(thread, NULL, foo, data), opcode);
-	if (opcode == JOIN)
+	else if (opcode == JOIN)
 		thread_error(pthread_join(*thread, NULL), opcode);
-	if (opcode == DETACH)
+	else if (opcode == DETACH)
 		thread_error(pthread_detach(*thread), opcode);
 	else
 		error("Threads: Operation invalid - use <CREATE> <JOIN> <DETACH>");

@@ -6,7 +6,7 @@
 /*   By: rbestman <rbestman@student.42berlin.de>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/06/28 20:37:55 by rbestman          #+#    #+#             */
-/*   Updated: 2025/06/28 21:17:29 by rbestman         ###   ########.fr       */
+/*   Updated: 2025/07/05 18:04:32 by rbestman         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -34,7 +34,7 @@ static const char	*valid_input(const char *str)
 		++str;
 	else if (*str == '-')
 		error("Input Invalid: values must be positive.");
-	if (!is_digit)
+	if (!is_digit(*str))
 		error("Input Invalid: value must be a digit");
 	num = str;
 	while(is_digit(*str++))
@@ -53,7 +53,7 @@ static long	ft_atol(const char *str)
 	while (is_digit(*str))
 		num = (num * 10) + (*str++ - '0');
 	if (num > INT_MAX)
-		error_exit("Input Invalid: value must not be larger than INT_MAX");
+		error("Input Invalid: value must not be larger than INT_MAX");
 	return (num);
 }
 
