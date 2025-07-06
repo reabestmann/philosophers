@@ -6,7 +6,7 @@
 /*   By: rbestman <rbestman@student.42berlin.de>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/04 17:21:02 by rbestman          #+#    #+#             */
-/*   Updated: 2025/07/05 20:20:09 by rbestman         ###   ########.fr       */
+/*   Updated: 2025/07/05 20:27:15 by rbestman         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -78,7 +78,8 @@ void *monitor_dinner(void *arg)
 	return (NULL);
 }
 
-/*void	*monitor_dinner(void *data)
+/*
+void	*monitor_dinner(void *data)
 {
 	int	i;
 	t_table *table;
