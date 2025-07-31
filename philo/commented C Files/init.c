@@ -12,60 +12,39 @@
 
 #include "philo.h"
 
-/* starts all threads & waits for them to finish */
-void	start_dinner(t_table *table)
-{
-	int	i;
-
-	i = 0;
-	if (table->meals_nbr == 0)
-		return ;
-	else if (table->philo_nbr == 1)
-	{
-		handle_threads(&table->philos[0].thread_id,
-			lonely_philo, &table->philos[0], CREATE);
-	}
-	else
-		create_philos(table);
-	handle_threads(&table->monitor, monitor_dinner, table, CREATE);
-	table->start_simulation = gettime(MILLISECOND);
-	set_bool(&table->mutex, &table->all_threads_ready, true);
-	while (i < table->philo_nbr)
-		handle_threads(&table->philos[i++].thread_id, NULL, NULL, JOIN);
-	set_bool(&table->mutex, &table->end_simulation, true);
-	handle_threads(&table->monitor, NULL, NULL, JOIN);
-}
-
 /* function that fills the fork structs */
 static void	assign_forks(t_philo *philo, t_fork *forks, int pos)
 {
 	int	nbr;
 
 	nbr = philo->table->philo_nbr;
+	// wraps back to 1st fork if last philo
 	philo->right_fork = &forks[(pos + 1) % nbr];
 	philo->left_fork = &forks[pos];
+	// if ID is even...
 	if (philo->id % 2 == 0)
 	{
-		philo->right_fork = &forks[pos];
+		philo->right_fork = &forks[pos]; //opposite assignment
 		philo->left_fork = &forks[(pos + 1) % nbr];
 	}
+	// to prevent deadlock-> make philos grap 'other' fork first
 }
 
 /* function that fills the philo struct with data */
 static void	philo_init(t_table *table)
 {
 	int		i;
-	t_philo	*philo;
+	t_philo	*philo; // to make code more readable
 
 	i = 0;
 	while (i < table->philo_nbr)
 	{
-		philo = table->philos + i;
-		philo->id = i + 1;
-		philo->full = false;
+		philo = table->philos + i; //assigning ptr to ptr of 'i'th philo of table
+		philo->id = i + 1; //bc we dont want the first philo to be called '0'
+		philo->full = false; // same as table->philos[i].full etc etc
 		philo->meals_eaten = 0;
-		philo->table = table;
-		handle_mutex(&philo->mutex, INIT);
+		philo->table = table; // assign table ptr so we can access table from philo struct
+		handle_mutex(&philo->mutex, INIT); //bc handle_mutex expects pointer to mutex
 		assign_forks(philo, table->forks, i);
 		i++;
 	}

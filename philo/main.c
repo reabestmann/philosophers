@@ -12,12 +12,13 @@
 
 #include "philo.h"
 
-/* USAGE: ./philo 5(philo_nbr) 800(time_to_die) 200(time_to_eat) 200(time_to_sleep) [5](meal_limit) */
+/* USAGE: ./philo 5(philo_nbr) 800(time_to_die) 
+	200(time_to_eat) 200(time_to_sleep) [5](meal_limit) */
 int	main(int params, char	**argv)
 {
 	t_table	table;
 
-	if (params == 5 || params == 6) //correct input
+	if (params == 5 || params == 6)
 	{
 		parse_input(&table, argv);
 		data_init(&table);
@@ -25,8 +26,6 @@ int	main(int params, char	**argv)
 		clean(&table);
 	}
 	else
-	{
-		error("USAGE: ./philo (philo_nbr) (time_to_die) (time_to_eat) (time_to_sleep) [max_meals]");
-	}
+		error("USAGE: ./philo 5 800 200 200 [5]");
 	return (0);
 }
